@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">VistaNotas</string>
+    <string name="title_inicio">Inicio</string>
+    <string name="title_calendario">Calendario</string>
+    <string name="title_cursos">Cursos</string>
+    <string name="title_pagos">Pagos</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

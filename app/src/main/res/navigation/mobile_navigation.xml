@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_inicio">
+
+    <fragment
+        android:id="@+id/navigation_inicio"
+        android:name="com.example.vistanotas.ui.inicio.InicioFragment"
+        android:label="@string/title_inicio"
+        tools:layout="@layout/fragment_inicio" />
+
+    <fragment
+        android:id="@+id/navigation_calendario"
+        android:name="com.example.vistanotas.ui.calendario.CalendarioFragment"
+        android:label="@string/title_calendario"
+        tools:layout="@layout/fragment_calendario" />
+
+    <fragment
+        android:id="@+id/navigation_cursos"
+        android:name="com.example.vistanotas.ui.cursos.CursosFragment"
+        android:label="@string/title_cursos"
+        tools:layout="@layout/fragment_cursos" />
+    <fragment
+        android:id="@+id/navigation_pagos"
+        android:name="com.example.vistanotas.ui.pagos.PagosFragment"
+        android:label="@string/title_pagos"
+        tools:layout="@layout/fragment_pagos" />
+</navigation>
