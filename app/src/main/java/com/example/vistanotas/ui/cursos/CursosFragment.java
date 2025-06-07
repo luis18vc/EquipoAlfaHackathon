@@ -24,7 +24,7 @@ public class CursosFragment extends Fragment {
         binding = FragmentCursosBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textCursos;
+        final TextView textView = binding.textView39;
         cursosViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
