@@ -27,6 +27,8 @@ public class InicioFragment extends Fragment {
         final TextView textView = binding.textHome;
         inicioViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         return root;
+
+
     }
 
     @Override

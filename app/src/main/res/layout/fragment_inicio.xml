@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <FrameLayout
-        android:layout_width="417dp"
+        android:layout_width="match_parent"
         android:layout_height="103dp"
         android:background="@color/pink"
         tools:layout_editor_absoluteX="1dp"
