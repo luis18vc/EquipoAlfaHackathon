@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VistaNotas</string>
+    <string name="title_inicio">Inicio</string>
+    <string name="title_calendario">Calendario</string>
+    <string name="title_cursos">Cursos</string>
+    <string name="title_pagos">Pagos</string>
+    <string name="title_fechas">28 Jun 2025</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Calendario">Calendario</string>
+    <string name="calendario">Calendario</string>
+    <string name="fecha_seleccionada">Fecha seleccionada:</string>
+    <string name="expandir">Expandir</string>
+    <string name="fechas_seleccionada">Fecha seleccionada:</string>
+    <string name="expandir_x">Expandir</string>
+    <string name="calendarios_de_cursos">Calendario de Cursos</string>
+</resources>
