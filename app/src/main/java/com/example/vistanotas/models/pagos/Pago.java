@@ -46,5 +46,6 @@ public class Pago {
     public void setEstado(String estado) {
         this.estado = estado;
     }
+    //faf
 
 }
