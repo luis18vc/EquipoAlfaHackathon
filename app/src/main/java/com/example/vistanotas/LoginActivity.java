@@ -3,6 +3,7 @@ package com.example.vistanotas;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -38,7 +39,6 @@ public class LoginActivity extends AppCompatActivity {
             finish();
             return;
         }
-
         setContentView(R.layout.activity_login);
 
         etUsuario = findViewById(R.id.etUsuario);
@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         btnIngresar = findViewById(R.id.btnIngresar);
 
         btnIngresar.setOnClickListener(v -> {
-            String usuario = etUsuario.getText().toString().trim();
+            String usuario = etUsuario.getText().toString().trim().toLowerCase();  // Siempre minúscula
             String contrasena = etContrasena.getText().toString().trim();
 
             if(usuario.isEmpty() || contrasena.isEmpty()) {
@@ -61,13 +61,14 @@ public class LoginActivity extends AppCompatActivity {
             call.enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                    Log.d("API_RESPONSE", "Código: " + response.code() + " | Body: " + response.body()); // ✅ Log de la respuesta
+
                     if(response.isSuccessful() && response.body() != null) {
                         LoginResponse loginResponse = response.body();
 
                         String token = loginResponse.getAccess();
                         Usuario user = loginResponse.getUser();
 
-                        // Guardar token y datos del usuario en SharedPreferences
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putBoolean(KEY_LOGGED_IN, true);
                         editor.putString("token", token);
@@ -80,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
 
                         editor.apply();
 
-                        // Ir a MainActivity
                         startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         finish();
                     } else {
@@ -91,6 +91,7 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<LoginResponse> call, Throwable t) {
                     Toast.makeText(LoginActivity.this, "Error en conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e("API_ERROR", "Error en conexión: ", t);
                 }
             });
         });

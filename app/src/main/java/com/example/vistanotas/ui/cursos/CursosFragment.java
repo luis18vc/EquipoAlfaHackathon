@@ -55,12 +55,12 @@ public class CursosFragment extends Fragment {
 
         SharedPreferences preferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String token = preferences.getString("token", null);
-
+        String bearerToken = "Bearer " + token;
         if (token == null) {
             Toast.makeText(context, "No se encontró token de acceso. Por favor, inicia sesión.", Toast.LENGTH_SHORT).show();
             return; // No seguir si no hay token
         }
-        Call<CursosResponse> call = apiService.obtenerCursos(token);
+        Call<CursosResponse> call = apiService.obtenerCursos(bearerToken);
 
         call.enqueue(new Callback<CursosResponse>() {
             @Override

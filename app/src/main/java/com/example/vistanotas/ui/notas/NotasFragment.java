@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,14 +46,22 @@ public class NotasFragment extends Fragment {
         recyclerViewNotas = view.findViewById(R.id.recyclerNotas);
         recyclerViewNotas.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        // Botón para volver a cursos
+        Button btnVolver = view.findViewById(R.id.btnVolverCursos);
+        btnVolver.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
+        });
+
+        // Obtener token desde SharedPreferences
         SharedPreferences preferences = requireContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String token = preferences.getString("token", null);
 
         if (token == null) {
             Toast.makeText(requireContext(), "No se encontró token de acceso. Por favor, inicia sesión.", Toast.LENGTH_SHORT).show();
-            return view;  // Retorna la vista aunque no haya token
+            return view;
         }
 
+        // Obtener el id del curso enviado como argumento
         String idCurso = getArguments() != null ? getArguments().getString("idCurso") : null;
         obtenerNotasDesdeApi(idCurso, token);
 
@@ -61,11 +70,6 @@ public class NotasFragment extends Fragment {
 
     private void obtenerNotasDesdeApi(String cursoId, String token) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-
-        if (token == null) {
-            Toast.makeText(requireContext(), "No se encontró token de acceso. Por favor, inicia sesión.", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         Call<NotasResponse> call = apiService.obtenerNotas(cursoId, "Bearer " + token);
 
@@ -89,3 +93,4 @@ public class NotasFragment extends Fragment {
         });
     }
 }
+

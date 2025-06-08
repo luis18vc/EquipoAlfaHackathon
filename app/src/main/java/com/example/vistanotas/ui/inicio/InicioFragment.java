@@ -1,5 +1,6 @@
 package com.example.vistanotas.ui.inicio;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,19 +28,23 @@ public class InicioFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentInicioBinding.inflate(inflater, container, false);
 
-        // 1. Seguir usando tu ViewModel para el texto principal
+        // ViewModel (opcional)
         InicioViewModel inicioViewModel =
                 new ViewModelProvider(this).get(InicioViewModel.class);
         inicioViewModel.getText().observe(getViewLifecycleOwner(),
                 binding.textHome::setText);
 
-        // 2. Lógica del código de barras
-        String studentCode = "U21212121";
-        binding.studentCodeText.setText(studentCode);      // arriba de la imagen
-        binding.barcodeNumberText.setText(studentCode);    // debajo de la imagen
+        // Obtener el código del usuario desde SharedPreferences
+        SharedPreferences preferences = requireContext().getSharedPreferences("LoginPrefs", android.content.Context.MODE_PRIVATE);
+        String studentCode = preferences.getString("user_cod", "CODIGO_NO_ENCONTRADO");
 
+        // Mostrar el código en pantalla
+        binding.studentCodeText.setText(studentCode);
+        binding.barcodeNumberText.setText(studentCode);
+
+        // Generar código de barras
         try {
-            Bitmap barcode = generateBarcode(studentCode, 600, 200); // ancho-alto a tu gusto
+            Bitmap barcode = generateBarcode(studentCode, 600, 200);
             binding.barcodeImageView.setImageBitmap(barcode);
         } catch (WriterException e) {
             Toast.makeText(requireContext(),

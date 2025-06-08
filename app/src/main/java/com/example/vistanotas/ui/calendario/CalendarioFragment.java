@@ -100,7 +100,7 @@ public class CalendarioFragment extends Fragment {
                 String.format("%02d", selectedDay);
 
         // Llamamos al método POST que recibe token y fecha en body
-        Call<CalendarioResponse> call = apiService.obtenerCalendario(token, new CalendarioRequest(fechaFormateada));
+        Call<CalendarioResponse> call = apiService.obtenerCalendario(bearerToken, new CalendarioRequest(fechaFormateada));
 
         call.enqueue(new Callback<CalendarioResponse>() {
             @Override

@@ -1,11 +1,11 @@
 package com.example.vistanotas.models.sesion;
 public class LoginRequest {
     private String cod;
-    private String password;
+    private String contraseña;
 
-    public LoginRequest(String cod, String password) {
+    public LoginRequest(String cod, String contraseña) {
         this.cod = cod;
-        this.password = password;
+        this.contraseña = contraseña;
     }
 
     // Getters y Setters (opcional si usas Gson)
@@ -18,10 +18,10 @@ public class LoginRequest {
     }
 
     public String getPassword() {
-        return password;
+        return contraseña;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.contraseña = password;
     }
 }
