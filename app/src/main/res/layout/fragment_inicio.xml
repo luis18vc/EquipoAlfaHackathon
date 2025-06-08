@@ -141,28 +141,6 @@
 
         </GridLayout>
 
-        <FrameLayout
-            android:id="@+id/card_bottom_grey_section_frame"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="#D0D0D0">
-
-            <Button
-                android:id="@+id/view_calendar_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Ver calendario"
-                android:textColor="@android:color/black"
-                android:background="@android:color/transparent"
-                android:textAllCaps="false"
-                android:textSize="14sp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"
-                android:padding="8dp" />
-        </FrameLayout>
-
     </LinearLayout>
 
     <LinearLayout
