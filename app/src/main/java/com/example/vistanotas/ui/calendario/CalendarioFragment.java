@@ -23,10 +23,11 @@ import com.example.vistanotas.interfaces.ApiService;
 import com.example.vistanotas.models.calendario.CalendarioRequest;
 import com.example.vistanotas.models.calendario.CalendarioResponse;
 import com.example.vistanotas.models.calendario.Clase;
+import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,6 +37,9 @@ public class CalendarioFragment extends Fragment {
 
     private FragmentCalendarioBinding binding;
     private int selectedYear, selectedMonth, selectedDay;
+
+    private static final String PREFS_NAME = "CalendarioPrefs";
+    private static final String KEY_CALENDARIO_HOY = "calendario_hoy";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -50,7 +54,8 @@ public class CalendarioFragment extends Fragment {
         Button expandCalendarButton = binding.expandCalendarButton;
         LinearLayout eventContainer = binding.eventContainer;
 
-        Calendar calendar = Calendar.getInstance();
+        // Obtener la fecha actual según zona horaria Lima/Perú
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Lima"));
         selectedYear = calendar.get(Calendar.YEAR);
         selectedMonth = calendar.get(Calendar.MONTH);
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
@@ -84,22 +89,19 @@ public class CalendarioFragment extends Fragment {
         eventContainer.removeAllViews();
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        // Obtener token guardado en SharedPreferences
         SharedPreferences preferences = context.getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String token = preferences.getString("token", null);
 
         if (token == null) {
             Toast.makeText(context, "No se encontró token de acceso. Por favor, inicia sesión.", Toast.LENGTH_SHORT).show();
-            return; // No seguir si no hay token
+            return;
         }
 
-        // Agregar el prefijo "Bearer " que espera la API
         String bearerToken = "Bearer " + token;
         String fechaFormateada = selectedYear + "-" +
                 String.format("%02d", selectedMonth + 1) + "-" +
                 String.format("%02d", selectedDay);
 
-        // Llamamos al método POST que recibe token y fecha en body
         Call<CalendarioResponse> call = apiService.obtenerCalendario(bearerToken, new CalendarioRequest(fechaFormateada));
 
         call.enqueue(new Callback<CalendarioResponse>() {
@@ -108,21 +110,16 @@ public class CalendarioFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     CalendarioResponse calendario = response.body();
 
-                    List<Clase> clases = calendario.getClases();
-
-                    if (clases == null || clases.isEmpty()) {
-                        agregarTexto(eventContainer, context, "No hay clases para esta fecha.");
-                    } else {
-                        for (Clase clase : clases) {
-                            String textoClase = "Curso: " + clase.getCurso() + "\n"
-                                    + "Profesor: " + clase.getProfesor() + "\n"
-                                    + "Salón: " + clase.getSalon() + "\n"
-                                    + "Horario: " + clase.getInicio() + " - " + clase.getFin();
-                            agregarTexto(eventContainer, context, textoClase);
-                        }
+                    // Guardar localmente solo si la fecha consultada es la fecha actual
+                    if (esFechaHoy(fechaFormateada)) {
+                        guardarCalendarioLocal(context, calendario);
                     }
+
+                    mostrarClases(eventContainer, context, calendario.getClases());
+
                 } else {
                     Toast.makeText(context, "Error al cargar calendario", Toast.LENGTH_SHORT).show();
+                    cargarCalendarioLocalSiExiste(eventContainer, context);
                 }
             }
 
@@ -130,9 +127,25 @@ public class CalendarioFragment extends Fragment {
             public void onFailure(Call<CalendarioResponse> call, Throwable t) {
                 Toast.makeText(context, "Fallo en la conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 Log.e("CalendarioAPI", "Error: ", t);
+                cargarCalendarioLocalSiExiste(eventContainer, context);
             }
         });
     }
+
+    private void mostrarClases(LinearLayout eventContainer, Context context, List<Clase> clases) {
+        if (clases == null || clases.isEmpty()) {
+            agregarTexto(eventContainer, context, "No hay clases para esta fecha.");
+        } else {
+            for (Clase clase : clases) {
+                String textoClase = "Curso: " + clase.getCurso() + "\n"
+                        + "Profesor: " + clase.getProfesor() + "\n"
+                        + "Salón: " + clase.getSalon() + "\n"
+                        + "Horario: " + clase.getInicio() + " - " + clase.getFin();
+                agregarTexto(eventContainer, context, textoClase);
+            }
+        }
+    }
+
     private void agregarTexto(LinearLayout container, Context context, String texto) {
         TextView textView = new TextView(context);
         textView.setText(texto);
@@ -146,6 +159,40 @@ public class CalendarioFragment extends Fragment {
         params.setMargins(0, 0, 0, 16);
         textView.setLayoutParams(params);
         container.addView(textView);
+    }
+
+    private void guardarCalendarioLocal(Context context, CalendarioResponse calendario) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        Gson gson = new Gson();
+        String jsonCalendario = gson.toJson(calendario);
+
+        editor.putString(KEY_CALENDARIO_HOY, jsonCalendario);
+        editor.apply();
+    }
+
+    private void cargarCalendarioLocalSiExiste(LinearLayout eventContainer, Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String jsonGuardado = prefs.getString(KEY_CALENDARIO_HOY, null);
+
+        if (jsonGuardado != null) {
+            Gson gson = new Gson();
+            CalendarioResponse calendarioLocal = gson.fromJson(jsonGuardado, CalendarioResponse.class);
+            Toast.makeText(context, "Mostrando datos guardados localmente", Toast.LENGTH_SHORT).show();
+            mostrarClases(eventContainer, context, calendarioLocal.getClases());
+        } else {
+            agregarTexto(eventContainer, context, "No hay datos disponibles sin conexión.");
+        }
+    }
+
+    private boolean esFechaHoy(String fecha) {
+        // fecha en formato yyyy-MM-dd
+        Calendar hoy = Calendar.getInstance(TimeZone.getTimeZone("America/Lima"));
+        String hoyStr = hoy.get(Calendar.YEAR) + "-" +
+                String.format("%02d", hoy.get(Calendar.MONTH) + 1) + "-" +
+                String.format("%02d", hoy.get(Calendar.DAY_OF_MONTH));
+        return fecha.equals(hoyStr);
     }
 
     @Override

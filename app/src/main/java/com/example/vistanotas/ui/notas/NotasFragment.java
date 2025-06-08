@@ -23,7 +23,10 @@ import com.example.vistanotas.ui.adapters.NotasAdapter;
 import com.example.vistanotas.interfaces.ApiService;
 import com.example.vistanotas.models.notas.Nota;
 import com.example.vistanotas.models.notas.NotasResponse;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import retrofit2.Call;
@@ -63,6 +66,7 @@ public class NotasFragment extends Fragment {
 
         // Obtener el id del curso enviado como argumento
         String idCurso = getArguments() != null ? getArguments().getString("idCurso") : null;
+
         obtenerNotasDesdeApi(idCurso, token);
 
         return view;
@@ -73,24 +77,65 @@ public class NotasFragment extends Fragment {
 
         Call<NotasResponse> call = apiService.obtenerNotas(cursoId, "Bearer " + token);
 
+        final boolean[] responded = {false};
+
+        // Timeout de 3 segundos para cargar datos locales si no responde la API
+        new android.os.Handler().postDelayed(() -> {
+            if (!responded[0]) {
+                Toast.makeText(requireContext(), "La señal es lenta, cargando notas locales...", Toast.LENGTH_SHORT).show();
+                cargarNotasLocales(cursoId);
+                call.cancel();
+            }
+        }, 3000);
+
         call.enqueue(new Callback<NotasResponse>() {
             @Override
             public void onResponse(@NonNull Call<NotasResponse> call, @NonNull Response<NotasResponse> response) {
+                responded[0] = true;
                 if (response.isSuccessful() && response.body() != null) {
                     List<Nota> notas = response.body().getNotas();
-                    notasAdapter = new NotasAdapter(notas);
-                    recyclerViewNotas.setAdapter(notasAdapter);
+                    mostrarNotas(notas);
+                    guardarNotasLocalmente(cursoId, notas);
                 } else {
-                    Toast.makeText(requireContext(), "Error en la respuesta de la API", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Error en la respuesta de la API, cargando notas locales...", Toast.LENGTH_SHORT).show();
+                    cargarNotasLocales(cursoId);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<NotasResponse> call, @NonNull Throwable t) {
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                responded[0] = true;
+                Toast.makeText(requireContext(), "Error: " + t.getMessage() + ", cargando notas locales...", Toast.LENGTH_LONG).show();
                 Log.e("API_ERROR", "onFailure: ", t);
+                cargarNotasLocales(cursoId);
             }
         });
     }
-}
 
+    private void mostrarNotas(List<Nota> notas) {
+        notasAdapter = new NotasAdapter(notas);
+        recyclerViewNotas.setAdapter(notasAdapter);
+    }
+
+    private void guardarNotasLocalmente(String cursoId, List<Nota> notas) {
+        Gson gson = new Gson();
+        String notasJson = gson.toJson(notas);
+
+        SharedPreferences.Editor editor = requireContext().getSharedPreferences("NotasPrefs", Context.MODE_PRIVATE).edit();
+        editor.putString("notas_" + cursoId, notasJson);
+        editor.apply();
+    }
+
+    private void cargarNotasLocales(String cursoId) {
+        SharedPreferences preferences = requireContext().getSharedPreferences("NotasPrefs", Context.MODE_PRIVATE);
+        String json = preferences.getString("notas_" + cursoId, null);
+
+        if (json != null) {
+            Type listType = new TypeToken<List<Nota>>() {}.getType();
+            List<Nota> notas = new Gson().fromJson(json, listType);
+            mostrarNotas(notas);
+        } else {
+            Toast.makeText(requireContext(), "No hay notas guardadas localmente.", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
