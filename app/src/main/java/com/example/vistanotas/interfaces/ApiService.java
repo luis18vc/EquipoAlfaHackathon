@@ -5,6 +5,7 @@ import com.example.vistanotas.models.calendario.CalendarioResponse;
 import com.example.vistanotas.models.cursos.Curso;
 import com.example.vistanotas.models.cursos.CursosResponse;
 import com.example.vistanotas.models.notas.NotasResponse;
+import com.example.vistanotas.models.pagos.Pago;
 import com.example.vistanotas.models.pagos.PagosResponse;
 import com.example.vistanotas.models.sesion.LoginRequest;
 import com.example.vistanotas.models.sesion.LoginResponse;
@@ -25,7 +26,7 @@ public interface ApiService {
     Call<CursosResponse> obtenerCursos(@Header("Authorization") String token);
 
     @GET("/api/v1/pagos/obtener-pagos")
-    Call<PagosResponse> obtenerPagos(@Header("Authorization") String token);
+    Call<List<Pago>> obtenerPagos(@Header("Authorization") String token);
 
 
     @GET("/api/v1/notas/{cursoId}/obtener-notas")

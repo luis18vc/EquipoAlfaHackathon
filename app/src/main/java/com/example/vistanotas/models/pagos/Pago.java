@@ -3,7 +3,7 @@ package com.example.vistanotas.models.pagos;
 public class Pago {
     private String item;
     private String descripcion;
-    private double monto;
+    private String monto;
     private String vencimiento;
     private String estado;
 
@@ -23,11 +23,11 @@ public class Pago {
         this.descripcion = descripcion;
     }
 
-    public double getMonto() {
+    public String getMonto() {
         return monto;
     }
 
-    public void setMonto(double monto) {
+    public void setMonto(String monto) {
         this.monto = monto;
     }
 

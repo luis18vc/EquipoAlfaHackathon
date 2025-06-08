@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,8 @@ import com.example.vistanotas.databinding.FragmentPagosBinding;
 import com.example.vistanotas.interfaces.ApiService;
 import com.example.vistanotas.models.pagos.Pago;
 import com.example.vistanotas.models.pagos.PagosResponse;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
@@ -32,6 +36,12 @@ import retrofit2.Response;
 public class PagosFragment extends Fragment {
 
     private FragmentPagosBinding binding;
+
+    private static final String PREFS_NAME = "PagosPrefs";
+    private static final String KEY_PAGOS_JSON = "pagos_json";
+
+    private Handler timeoutHandler = new Handler(Looper.getMainLooper());
+    private boolean responseReceived = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -47,6 +57,7 @@ public class PagosFragment extends Fragment {
 
     private void obtenerPagosDesdeAPI(LinearLayout eventContainer) {
         eventContainer.removeAllViews();
+        responseReceived = false;
 
         SharedPreferences preferences = requireContext().getSharedPreferences("LoginPrefs", Context.MODE_PRIVATE);
         String token = preferences.getString("token", null);
@@ -60,62 +71,119 @@ public class PagosFragment extends Fragment {
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
-        Call<PagosResponse> call = apiService.obtenerPagos(token);
+        Call<List<Pago>> call = apiService.obtenerPagos(token);
 
-        call.enqueue(new Callback<PagosResponse>() {
+        // Timeout: si no responde en 3 segundos, cargamos pagos locales
+        timeoutHandler.postDelayed(() -> {
+            if (!responseReceived) {
+                Toast.makeText(requireContext(), "La respuesta tarda mucho, cargando pagos locales", Toast.LENGTH_SHORT).show();
+                mostrarPagosLocales(eventContainer);
+                call.cancel(); // Cancelamos la llamada para no seguir esperando
+            }
+        }, 3000);
+
+        call.enqueue(new Callback<List<Pago>>() {
             @Override
-            public void onResponse(Call<PagosResponse> call, Response<PagosResponse> response) {
+            public void onResponse(Call<List<Pago>> call, Response<List<Pago>> response) {
+                responseReceived = true;
+                timeoutHandler.removeCallbacksAndMessages(null); // Cancelamos timeout
+
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Pago> pagos = response.body().getPagos();
+                    List<Pago> pagos = response.body();
 
                     if (pagos == null || pagos.isEmpty()) {
                         agregarTexto(eventContainer, "No hay datos de pago disponibles");
                     } else {
-                        for (Pago p : pagos) {
-                            Button btnPago = new Button(requireContext());
+                        // Guardar pagos localmente
+                        guardarPagosLocalmente(pagos);
 
-                            String texto = p.getDescripcion() + " - S/ " + p.getMonto() + " - Vence: " + p.getVencimiento() + " - " + p.getEstado();
-                            btnPago.setText(texto);
-                            btnPago.setAllCaps(false);
-                            btnPago.setTextColor(Color.WHITE);
-
-                            switch (p.getEstado().toUpperCase()) {
-                                case "PAGADO":
-                                    btnPago.setBackgroundColor(Color.parseColor("#4CAF50")); // Verde
-                                    break;
-                                case "PENDIENTE DE PAGO":
-                                    btnPago.setBackgroundColor(Color.parseColor("#C8102E")); // Rojo UTP
-                                    break;
-                                default:
-                                    btnPago.setBackgroundColor(Color.parseColor("#003865")); // Azul UTP
-                                    break;
-                            }
-
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                    ViewGroup.LayoutParams.MATCH_PARENT,
-                                    ViewGroup.LayoutParams.WRAP_CONTENT
-                            );
-                            params.setMargins(0, 24, 0, 0);
-                            btnPago.setLayoutParams(params);
-
-                            btnPago.setOnClickListener(v -> Toast.makeText(requireContext(),
-                                    "Pago: " + p.getDescripcion() + " - Estado: " + p.getEstado(),
-                                    Toast.LENGTH_SHORT).show());
-
-                            eventContainer.addView(btnPago);
-                        }
+                        mostrarPagos(eventContainer, pagos);
                     }
                 } else {
                     Toast.makeText(requireContext(), "Error al cargar los pagos", Toast.LENGTH_SHORT).show();
+                    mostrarPagosLocales(eventContainer);
                 }
             }
 
             @Override
-            public void onFailure(Call<PagosResponse> call, Throwable t) {
+            public void onFailure(Call<List<Pago>> call, Throwable t) {
+                responseReceived = true;
+                timeoutHandler.removeCallbacksAndMessages(null);
+
                 Toast.makeText(requireContext(), "Fallo en la conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 Log.e("PagosAPI", "Error: ", t);
+                mostrarPagosLocales(eventContainer);
             }
         });
+    }
+
+    private void mostrarPagos(LinearLayout container, List<Pago> pagos) {
+        container.removeAllViews();
+
+        if (pagos == null || pagos.isEmpty()) {
+            agregarTexto(container, "No hay datos de pago disponibles");
+            return;
+        }
+
+        for (Pago p : pagos) {
+            Button btnPago = new Button(requireContext());
+
+            String texto = p.getDescripcion() + " - " + p.getMonto() + " - Vence: " + p.getVencimiento() + " - " + p.getEstado();
+            btnPago.setText(texto);
+            btnPago.setAllCaps(false);
+            btnPago.setTextColor(Color.WHITE);
+
+            switch (p.getEstado().toUpperCase()) {
+                case "PAGADO":
+                    btnPago.setBackgroundColor(Color.parseColor("#4CAF50")); // Verde
+                    break;
+                case "PENDIENTE DE PAGO":
+                    btnPago.setBackgroundColor(Color.parseColor("#C8102E")); // Rojo UTP
+                    break;
+                default:
+                    btnPago.setBackgroundColor(Color.parseColor("#003865")); // Azul UTP
+                    break;
+            }
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 24, 0, 0);
+            btnPago.setLayoutParams(params);
+
+            btnPago.setOnClickListener(v -> Toast.makeText(requireContext(),
+                    "Pago: " + p.getDescripcion() + " - Estado: " + p.getEstado(),
+                    Toast.LENGTH_SHORT).show());
+
+            container.addView(btnPago);
+        }
+    }
+
+    private void guardarPagosLocalmente(List<Pago> pagos) {
+        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        Gson gson = new Gson();
+        String pagosJson = gson.toJson(pagos);
+
+        editor.putString(KEY_PAGOS_JSON, pagosJson);
+        editor.apply();
+    }
+
+    private void mostrarPagosLocales(LinearLayout container) {
+        SharedPreferences prefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String pagosJson = prefs.getString(KEY_PAGOS_JSON, null);
+
+        if (pagosJson == null) {
+            agregarTexto(container, "No hay datos locales disponibles");
+            return;
+        }
+
+        Gson gson = new Gson();
+        List<Pago> pagos = gson.fromJson(pagosJson, new TypeToken<List<Pago>>(){}.getType());
+
+        mostrarPagos(container, pagos);
     }
 
     private void agregarTexto(LinearLayout container, String texto) {
