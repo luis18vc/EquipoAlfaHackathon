@@ -9,6 +9,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.vistanotas.interfaces.ApiService;
+import com.example.vistanotas.models.sesion.LoginRequest;
+import com.example.vistanotas.models.sesion.LoginResponse;
+import com.example.vistanotas.models.sesion.Usuario;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etUsuario, etContrasena;
@@ -21,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        final SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
         // Si ya está logueado, ir directo a MainActivity
         if (preferences.getBoolean(KEY_LOGGED_IN, false)) {
@@ -30,30 +39,60 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        setContentView(R.layout.activity_login);  // Enlazamos el XML
+        setContentView(R.layout.activity_login);
 
         etUsuario = findViewById(R.id.etUsuario);
         etContrasena = findViewById(R.id.etContrasena);
         btnIngresar = findViewById(R.id.btnIngresar);
 
         btnIngresar.setOnClickListener(v -> {
-            String usuario = etUsuario.getText().toString();
-            String contrasena = etContrasena.getText().toString();
+            String usuario = etUsuario.getText().toString().trim();
+            String contrasena = etContrasena.getText().toString().trim();
 
-            //Modificar para colocar los datos correctos del Login
-            if (usuario.equals("alumno") && contrasena.equals("1234")) {
-                Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
-
-                // Guardar sesión
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(KEY_LOGGED_IN, true);
-                editor.apply();
-
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
-            } else {
-                Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_SHORT).show();
+            if(usuario.isEmpty() || contrasena.isEmpty()) {
+                Toast.makeText(this, "Por favor ingrese usuario y contraseña", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            LoginRequest request = new LoginRequest(usuario, contrasena);
+
+            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            Call<LoginResponse> call = apiService.iniciarSesion(request);
+            call.enqueue(new Callback<LoginResponse>() {
+                @Override
+                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                    if(response.isSuccessful() && response.body() != null) {
+                        LoginResponse loginResponse = response.body();
+
+                        String token = loginResponse.getAccess();
+                        Usuario user = loginResponse.getUser();
+
+                        // Guardar token y datos del usuario en SharedPreferences
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putBoolean(KEY_LOGGED_IN, true);
+                        editor.putString("token", token);
+
+                        if (user != null) {
+                            editor.putInt("user_id", user.getId());
+                            editor.putString("user_usuario", user.getUsuario());
+                            editor.putString("user_cod", user.getCod());
+                        }
+
+                        editor.apply();
+
+                        // Ir a MainActivity
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Credenciales inválidas", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<LoginResponse> call, Throwable t) {
+                    Toast.makeText(LoginActivity.this, "Error en conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
 }

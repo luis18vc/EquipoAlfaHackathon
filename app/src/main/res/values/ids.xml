@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="scrollViewPagos" type="id" />
+    <item name="tvTituloPagos" type="id" />
+    <item name="layoutContenedorPagos" type="id" />
+    <item name="recyclerViewNotas" type="id"/>
+</resources>

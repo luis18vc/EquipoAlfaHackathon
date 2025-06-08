@@ -1,137 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingTop="60dp"
-    android:background="@color/bgfondo"
-    android:paddingHorizontal="40dp"
+    android:background="#F5F5F5"
+    android:padding="0dp">
 
-    tools:context=".ui.pagos.PagosFragment">
-
-
+    <!-- Título -->
     <TextView
-        android:id="@+id/textPagos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pagos pendientes"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="@color/black"
-        android:paddingBottom="8dp"
-        android:layout_gravity="center_horizontal"
-        android:textAlignment="center" />
-
-
-    <FrameLayout
+        android:id="@+id/tvTituloPagos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/pagos"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:gravity="center" />
 
-        android:padding="24dp">
+    <!-- ScrollView con lista de pagos -->
+    <ScrollView
+        android:id="@+id/scrollViewPagos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tvTituloPagos"
+        android:padding="16dp">
 
         <LinearLayout
-            android:id="@+id/layoutCuotaPendiente"
+            android:id="@+id/layoutContenedorPagos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/customborder"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/numeroCuotaPendiente"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Cuota 1"
-                    android:textColor="@color/black"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="S/.750"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"/>
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/title_fechas"
-                android:textSize="12sp"
-                android:textColor="@color/black"/>
-        </LinearLayout>
-    </FrameLayout>
-
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="16dp"/>
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pagos realizados"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="@color/black"
-        android:paddingBottom="8dp"
-        android:layout_gravity="center_horizontal"
-        android:textAlignment="center" />
-
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:padding="24dp">
-
-        <LinearLayout
-            android:id="@+id/layoutCuotaPagada"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Ejemplo de cuota pagada -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/customborder"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/numeroCuotaPagada"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Cuota 1"
-                    android:textColor="@color/black"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="S/.750"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"/>
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/title_fechas"
-                android:textSize="12sp"
-                android:textColor="@color/black"/>
-        </LinearLayout>
-    </FrameLayout>
-
-</LinearLayout>
+            android:orientation="vertical" />
+    </ScrollView>
+</RelativeLayout>

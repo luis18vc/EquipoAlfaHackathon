@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">VistaNotas</string>
     <string name="title_inicio">Inicio</string>
@@ -14,4 +15,10 @@
     <string name="fechas_seleccionada">Fecha seleccionada:</string>
     <string name="expandir_x">Expandir</string>
     <string name="calendarios_de_cursos">Calendario de Cursos</string>
+    <string name="pagos">Pagos</string>
+    <string name="cd_scroll_pagos">Scrollable area for payments</string>
+    <string name="alg">ALG</string>
+    <string name="curso_de_algoritmos">Curso de Algoritmos</string>
+    <string name="nota_17_5">Nota: 17.5</string>
+    <string name="promedio">Promedio:</string>
 </resources>
