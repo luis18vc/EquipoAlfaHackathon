@@ -18,9 +18,28 @@
     <fragment
         android:id="@+id/navigation_cursos"
         android:name="com.example.vistanotas.ui.cursos.CursosFragment"
-        tools:layout="@layout/fragment_cursos" />
+        tools:layout="@layout/fragment_cursos">
+
+        <action
+            android:id="@+id/action_cursosFragment_to_detalleFragment"
+            app:destination="@id/navigation_infocursos" />
+    </fragment>
+
+
     <fragment
         android:id="@+id/navigation_pagos"
         android:name="com.example.vistanotas.ui.pagos.PagosFragment"
         tools:layout="@layout/fragment_pagos" />
+    <fragment
+        android:id="@+id/navigation_infocursos"
+        android:name="com.example.vistanotas.ui.infocursos.InfoCursoFragment"
+        tools:layout="@layout/fragment_info_curso" >
+        <action
+            android:id="@+id/action_navigation_infocursos_to_navigation_calcnotas"
+            app:destination="@id/navigation_calcnotas" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_calcnotas"
+        android:name="com.example.vistanotas.ui.calcnotas.CalcnotasFragment"
+        tools:layout="@layout/fragment_calcnotas" />
 </navigation>
