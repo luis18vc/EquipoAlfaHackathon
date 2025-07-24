@@ -3,8 +3,11 @@ package com.example.vistanotas.ui.calendario;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -133,18 +137,64 @@ public class CalendarioFragment extends Fragment {
     }
 
     private void mostrarClases(LinearLayout eventContainer, Context context, List<Clase> clases) {
+        eventContainer.removeAllViews(); // Limpia contenido anterior
+
         if (clases == null || clases.isEmpty()) {
-            agregarTexto(eventContainer, context, "No hay clases para esta fecha.");
+            agregarTextoSimple(eventContainer, context, "No hay clases para esta fecha.");
         } else {
             for (Clase clase : clases) {
-                String textoClase = "Curso: " + clase.getCurso() + "\n"
-                        + "Profesor: " + clase.getProfesor() + "\n"
-                        + "Salón: " + clase.getSalon() + "\n"
-                        + "Horario: " + clase.getInicio() + " - " + clase.getFin();
-                agregarTexto(eventContainer, context, textoClase);
+                CardView cardView = new CardView(context);
+                LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                cardParams.setMargins(24, 16, 24, 0); // Margen externo
+                cardView.setLayoutParams(cardParams);
+                cardView.setRadius(20f);
+                cardView.setCardElevation(8f);
+                cardView.setUseCompatPadding(true);
+
+                LinearLayout layoutInterno = new LinearLayout(context);
+                layoutInterno.setOrientation(LinearLayout.VERTICAL);
+                layoutInterno.setPadding(32, 24, 32, 24); // Padding interno
+
+                TextView curso = crearTextoEstilizado(context, "📘  " + clase.getCurso(), 18, Typeface.BOLD);
+                TextView profesor = crearTextoEstilizado(context, "👨‍🏫  Profesor: " + clase.getProfesor(), 16, Typeface.NORMAL);
+                TextView salon = crearTextoEstilizado(context, "🏫  Salón: " + clase.getSalon(), 16, Typeface.NORMAL);
+                TextView horario = crearTextoEstilizado(context, "🕒  Horario: " + clase.getInicio() + " - " + clase.getFin(), 16, Typeface.ITALIC);
+
+                layoutInterno.addView(curso);
+                layoutInterno.addView(profesor);
+                layoutInterno.addView(salon);
+                layoutInterno.addView(horario);
+
+                cardView.addView(layoutInterno);
+                eventContainer.addView(cardView);
             }
         }
     }
+    private void agregarTextoSimple(LinearLayout container, Context context, String mensaje) {
+        TextView tv = new TextView(context);
+        tv.setText(mensaje);
+        tv.setTextSize(16f);
+        tv.setTextColor(Color.GRAY);
+        tv.setGravity(Gravity.CENTER);
+        tv.setPadding(30, 50, 30, 50);
+        container.addView(tv);
+    }
+
+    private TextView crearTextoEstilizado(Context context, String texto, int textSize, int estilo) {
+        TextView tv = new TextView(context);
+        tv.setText(texto);
+        tv.setTextSize(textSize);
+        tv.setTypeface(null, estilo);
+        tv.setTextColor(Color.parseColor("#333333")); // gris oscuro
+        tv.setLineSpacing(4f, 1.2f);// interlineado
+        tv.setPadding(0, 8, 0, 8);
+        return tv;
+    }
+
+
 
     private void agregarTexto(LinearLayout container, Context context, String texto) {
         TextView textView = new TextView(context);

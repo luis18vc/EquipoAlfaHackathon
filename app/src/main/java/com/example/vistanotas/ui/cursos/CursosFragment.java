@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -153,19 +154,32 @@ public class CursosFragment extends Fragment {
 
     private void mostrarCursos(LinearLayout container, Context context, List<Curso> cursos) {
         for (Curso c : cursos) {
+            // Crear el CardView
+            CardView cardView = new CardView(context);
+            cardView.setCardElevation(8);
+            cardView.setRadius(16);
+            cardView.setUseCompatPadding(true);
+            cardView.setCardBackgroundColor(0xFFFFFFFF);
+
+            // Margen para la tarjeta
+            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            cardParams.setMargins(0, 24, 0, 0);
+            cardView.setLayoutParams(cardParams);
+
+            // Crear un botón dentro de la tarjeta
             Button btnCurso = new Button(context);
             btnCurso.setText(c.getTitulo());
             btnCurso.setAllCaps(false);
             btnCurso.setTextColor(0xFFFFFFFF);
-            btnCurso.setBackgroundColor(0xFF2196F3);
+            btnCurso.setBackgroundColor(0xFF2196F3); // Azul Material
+            btnCurso.setTextSize(18f);
+            btnCurso.setPadding(32, 32, 32, 32);
+            btnCurso.setBackgroundResource(R.drawable.boton_curso_background); // opcional para fondo redondeado
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            params.setMargins(0, 24, 0, 0);
-            btnCurso.setLayoutParams(params);
-
+            // Acción al hacer clic
             btnCurso.setOnClickListener(v -> {
                 Toast.makeText(context, "Curso: " + c.getTitulo(), Toast.LENGTH_SHORT).show();
 
@@ -176,9 +190,14 @@ public class CursosFragment extends Fragment {
                 navController.navigate(R.id.action_cursosFragment_to_notasFragment, bundle);
             });
 
-            container.addView(btnCurso);
+            // Añadir botón a la tarjeta
+            cardView.addView(btnCurso);
+
+            // Añadir la tarjeta al contenedor
+            container.addView(cardView);
         }
     }
+
 
     private void guardarCursosLocalmente(Context context, List<Curso> cursos) {
         Gson gson = new Gson();

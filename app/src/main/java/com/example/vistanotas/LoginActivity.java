@@ -33,6 +33,9 @@ public class LoginActivity extends AppCompatActivity {
 
         final SharedPreferences preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
         // Si ya está logueado, ir directo a MainActivity
         if (preferences.getBoolean(KEY_LOGGED_IN, false)) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));

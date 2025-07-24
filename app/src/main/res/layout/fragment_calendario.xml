@@ -34,6 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textStyle="bold"
             android:text="@string/fechas_seleccionada"
             android:textSize="18sp"/>
 
@@ -47,16 +48,17 @@
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="544dp"
         android:layout_below="@id/calendarBar"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="43dp"
         android:padding="16dp">
 
         <LinearLayout
             android:id="@+id/eventContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"/>
+            android:orientation="vertical" />
     </ScrollView>
 
 </RelativeLayout>

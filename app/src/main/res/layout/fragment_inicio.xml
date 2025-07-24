@@ -4,9 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+
     <TextView
         android:id="@+id/text_home"
         android:layout_width="match_parent"
@@ -25,7 +27,7 @@
         <View
             android:id="@+id/top_pink_section"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="146dp"
             android:layout_weight="1"
             android:background="#ea5770" />
 
@@ -34,7 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
-            android:background="@android:color/white" />
+            android:background="@color/bgfondo" />
+
 
     </LinearLayout>
 
@@ -42,12 +45,12 @@
         android:id="@+id/greeting_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hola"
+        android:text="Bienvenido"
         android:textColor="@android:color/white"
-        android:textSize="24sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,115 +60,119 @@
         android:layout_height="wrap_content"
         android:text="U21212121"
         android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:textStyle="normal"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="55dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/course_card_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
+        android:layout_width="320dp"
+        android:layout_height="170dp"
         android:background="@drawable/rounded_rectangle_background"
-        app:layout_constraintWidth_percent="0.6"
-        app:layout_constraintDimensionRatio="H,1:0.6"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0.3" >
+        app:layout_constraintDimensionRatio="H,1:0.6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintWidth_percent="0.6">
 
         <GridLayout
             android:id="@+id/card_top_white_section_grid"
             android:layout_width="match_parent"
-            android:layout_height="40dp" android:layout_weight="1"
-            android:rowCount="2"
+            android:layout_height="match_parent"
+            android:background="@drawable/customborder"
             android:columnCount="2"
-            android:padding="8dp">
+            android:padding="25dp">
 
+            <!-- Fila 0: Nombre del curso sobre las dos columnas -->
             <TextView
                 android:id="@+id/course_name_tv"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_row="0"
                 android:layout_column="0"
+                android:layout_columnSpan="2"
                 android:layout_columnWeight="1"
-                android:layout_gravity="start|top"
-                android:text="Nombre del Curso"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Curso..."
                 android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/course_type_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_row="0"
-                android:layout_column="1"
-                android:layout_columnWeight="1"
-                android:layout_gravity="end|top"
-                android:text="Presencial"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp"
-                android:paddingStart="4dp" />
+            <!-- Fila 1, Col 0: Hora -->
+
+            <!-- Fila 1, Col 1: Aula -->
 
             <TextView
                 android:id="@+id/course_time_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_row="1"
-                android:layout_column="0"
+                android:layout_row="3"
+                android:layout_column="1"
                 android:layout_columnWeight="1"
-                android:layout_gravity="start|bottom"
-                android:text="18:30 - 20:00"
+                android:layout_gravity="start"
+                android:text="Hora"
                 android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textSize="18sp" />
 
+            <!-- Fila 2, Col 0: Tipo (puede compartir la columna 0) -->
             <TextView
                 android:id="@+id/course_room_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_row="3"
+                android:layout_column="1"
+                android:layout_gravity="end"
+                android:text="Aula"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/course_type_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_row="1"
                 android:layout_column="1"
-                android:layout_columnWeight="1"
-                android:layout_gravity="end|bottom"
-                android:text="D0812"
-                android:textColor="@android:color/black"
-                android:textSize="12sp"
-                android:paddingEnd="4dp" />
+                android:layout_gravity="start"
+                android:text="Presencial"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
 
         </GridLayout>
+
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/barcode_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/course_card_container"
-        app:layout_constraintBottom_toTopOf="@+id/nav_view"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="340dp"
+        android:layout_height="188dp"
         android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
-        android:background="@android:color/white" >
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/nav_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/course_card_container">
 
         <ImageView
             android:id="@+id/barcode_image_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
             android:padding="8dp"
+            android:scaleType="fitCenter"
             tools:src="@drawable/ic_barcode_placeholder" />
 
         <TextView
@@ -173,11 +180,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:gravity="center"
             android:text="U21212121"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:textStyle="bold" />
 
     </LinearLayout>
 
